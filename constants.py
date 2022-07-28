@@ -6,7 +6,7 @@ PMS_SET_PIN = 3  # Sleep
 PMS_RST_PIN = 4
 
 PMS_PERIOD = 300000  # (5 Min)
-PMS_WARM_PER = 10000  # ms (10 Seconds)
+PMS_WARM_PER = 30000  # ms (30 Seconds)
 PMS_RD_DEL = 5000  # ms
 PMS_RD_CNT = 10
 
