@@ -41,7 +41,6 @@ pms_sleep = Pin(PMS_SET_PIN, Pin.OUT, Pin.PULL_DOWN)
 pms_enable = Pin(PMS_RST_PIN, Pin.OUT, Pin.PULL_DOWN)
 
 
-
 def connect_wlan():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -160,7 +159,7 @@ def read_value(rd_ct: int):
             print("Bad Sleep Rsp")
             pass
         pms_sleep.off()  # Sleep
-        pms_enable.off() # Disable
+        pms_enable.off()  # Disable
 
 
 def filter_read_data(values: list):
@@ -185,8 +184,8 @@ def filter_read_data(values: list):
 
 if __name__ == "__main__":
     print("### Start ###")
-    pms_sleep.off() # Sleep
-    pms_enable.off() # Disable
+    pms_sleep.off()  # Sleep
+    pms_enable.off()  # Disable
     led_off()
     connect_wlan()
     mqtt_connected = False
@@ -196,4 +195,5 @@ if __name__ == "__main__":
             time.sleep(1)
     aqi_timer = Timer()
     aqi_timer.init(period=PMS_PERIOD, callback=read_aqi_sensor)
+    read_aqi_sensor(aqi_timer) # Schedule Immediate Read
     led_on()
