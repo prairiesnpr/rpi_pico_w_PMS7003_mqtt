@@ -1,4 +1,6 @@
 import network
+import gc
+import machine
 import micropython
 import time
 import json
@@ -46,10 +48,16 @@ def connect_wlan():
     wlan.active(True)
     wlan.connect(WIFI_AP, WIFI_PWD)
 
+    print(f"Connecting to {WIFI_AP}")
+
     while not wlan.isconnected() and wlan.status() >= 0:
         print("Waiting to connect:")
         time.sleep(1)
     print(wlan.ifconfig())
+
+    if wlan.ifconfig()[0] == "0.0.0.0":
+        print("Bad IP")
+        machine.reset()
 
 
 def led_off():
@@ -96,10 +104,13 @@ def mqtt_config():
         return True
     except Exception as e:
         print("MQTT Config Failed %s" % e)
+        machine.reset()
+        
         return False
 
 
 def read_aqi_sensor(t_obj: Timer):
+    gc.collect()
     pms_enable.on()
     pms_sleep.on()
     start_sensor_warmup()
@@ -175,7 +186,10 @@ def filter_read_data(values: list):
     print(result)
     sensor_prefix = f"{MQTT_PREFIX}/sensor"
     state_topic = f"{sensor_prefix}/{DEVICE}_{UNIQE_ID_PRE}/state"
-    publish_json_value(server=MQTT_HOST, topic=state_topic, value=result)
+    try:
+        publish_json_value(server=MQTT_HOST, topic=state_topic, value=result)
+    except OSError as e:
+        print(f"Failed to publish {e}")
 
 
 # Need to warm sensor up, discarding data
@@ -184,6 +198,7 @@ def filter_read_data(values: list):
 
 if __name__ == "__main__":
     print("### Start ###")
+    gc.collect()
     pms_sleep.off()  # Sleep
     pms_enable.off()  # Disable
     led_off()
